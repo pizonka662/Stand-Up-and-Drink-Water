@@ -1,8 +1,12 @@
+from tabnanny import check
+
 import serial
+import threading
+import time
 
 def readFromSerial(comport, baudrate):
 
-    ser = serial.Serial(comport, baudrate, timeout=0.1)
+    ser = serial.Serial(comport, baudrate, timeout=0.5)
     '''
     while True:
         data = ser.readline().decode().strip()
@@ -33,7 +37,20 @@ def checkTableHeight(input, maxTimeSitting=10):
                 print("It's time to stand up.")
                 counter = 0
 
+def checkWaterDrank(input):
+    while True:
+        data = input.readline().decode().strip()
+        print(data)
+        #if data:
+           #waterLevel = float(data.split("|")[1])
+            #print("Water level: ", waterLevel)
 
 if __name__ == '__main__':
     ser = readFromSerial('COM3', 115200)
-    checkTableHeight(ser)
+    #checkTableHeight(ser)
+    time.sleep(3)
+    heightThread = threading.Thread(target=checkTableHeight, args=(ser,))
+    heightThread.start()
+    time.sleep(3)
+    waterThread = threading.Thread(target=checkWaterDrank, args=(ser, ))
+    waterThread.start()
